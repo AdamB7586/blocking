@@ -47,7 +47,7 @@ class IPBlock{
      * @return boolean If the IP is listed will return true else will return false
      */
     public function isIPBlocked($ip){
-        return $this->db->select(sself::$blocked_ip_table, array('ip' => $ip));
+        return $this->db->select(self::$blocked_ip_table, array('ip' => $ip));
     }
     
     /**
@@ -65,7 +65,7 @@ class IPBlock{
      * @return boolean If the IP has been successfully added will return true else return false
      */
     public function addIPtoBlock($ip){
-        return $this->db->insert(sself::$blocked_ip_table, array('ip' => $ip));
+        return $this->db->insert(self::$blocked_ip_table, array('ip' => $ip));
     }
     
     /**
@@ -74,7 +74,7 @@ class IPBlock{
      * @return boolean If the IP address is successfully removed will return true else will return false
      */
     public function removeIPFromBlock($ip){
-        return $this->db->delete(sself::$blocked_ip_table, array('ip' => $ip), 1);
+        return $this->db->delete(self::$blocked_ip_table, array('ip' => $ip), 1);
     }
     
     /**
