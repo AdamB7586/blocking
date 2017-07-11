@@ -1,0 +1,19 @@
+{
+    "name": "adamb/blocking",
+    "version": "1.0.0",
+    "description": "Block IP by either IP or range and check to see if string contains blocked word or phrase",
+    "type": "library",
+    "require": {
+        "adamb/database": "^1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adam Binnersley",
+            "email": "abinnersley@gmail.com"
+        }
+    ],
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
