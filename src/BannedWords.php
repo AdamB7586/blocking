@@ -6,6 +6,8 @@
  * @author Adam Binnersley
  * @version 1.0.0
  */
+namespace Blocking;
+
 use DBAL\Database;
 
 class BannedWords{
