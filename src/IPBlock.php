@@ -42,11 +42,20 @@ class IPBlock{
     }
     
     /**
-     * Checks to see if the given IP is Blocked
+     * Checks to see if the given IP is Blocked by listing or range
      * @param string $ip This should be the IP you are checking if it is blocked
      * @return boolean If the IP is listed will return true else will return false
      */
     public function isIPBlocked($ip){
+        return ($this->isIPBlockedList($ip) || $this->isIPBlockedRange($ip));
+    }
+    
+    /**
+     * Checks to see if the given IP is Blocked
+     * @param string $ip This should be the IP you are checking if it is blocked
+     * @return boolean If the IP is listed will return true else will return false
+     */
+    public function isIPBlockedList($ip){
         return $this->db->select(self::$blocked_ip_table, array('ip' => $ip));
     }
     
