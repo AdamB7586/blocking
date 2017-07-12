@@ -1,6 +1,6 @@
 {
     "name": "adamb/blocking",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Block IP by either IP or range and check to see if string contains blocked word or phrase",
     "type": "library",
     "require": {
