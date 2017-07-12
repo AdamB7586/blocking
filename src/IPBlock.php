@@ -65,7 +65,7 @@ class IPBlock{
      * @return boolean If the IP is within a blocked range will return true else will return false
      */
     public function isIPBlockedRange($ip){
-        return $this->db->query("SELECT * FROM `".self::$blocked_range_table."` WHERE `start` <= :ip AND `end` >= :ip LIMIT 1;", array('ip' => $ip));
+        return $this->db->query("SELECT * FROM `".self::$blocked_range_table."` WHERE `ip_start` <= :ip AND `ip_end` >= :ip LIMIT 1;", array('ip' => $ip));
     }
     
     /**
@@ -101,7 +101,7 @@ class IPBlock{
      * @return boolean If the range is successfully added will return true else returns false
      */
     public function addRangetoBlock($start, $end){
-        return $this->db->insert(self::$blocked_range_table, array('start' => $start, 'end' => $end));
+        return $this->db->insert(self::$blocked_range_table, array('ip_start' => $start, 'ip_end' => $end));
     }
     
     /**
@@ -116,7 +116,7 @@ class IPBlock{
             $where = array('id' => $id);
         }
         else{
-            $where = array('start' => $start, 'end' => $end);
+            $where = array('ip_start' => $start, 'ip_end' => $end);
         }
         return $this->db->delete(self::$blocked_range_table, $where, 1);
     }
