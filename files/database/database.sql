@@ -23,3 +23,16 @@ CREATE TABLE IF NOT EXISTS `blocked_ip_range` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_range` (`ip_start`,`ip_end`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `blocked_words`
+--
+
+CREATE TABLE IF NOT EXISTS `blocked_words` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `word` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `word` (`word`)
+) ENGINE=MyISAM AUTO_INCREMENT=71 DEFAULT CHARSET=latin1;
