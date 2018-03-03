@@ -76,8 +76,8 @@ class BannedWords{
      * @return array|boolean If blocked words exist returns array else returns false
      */
     public function getBlockedWords($search = ''){
+        $where = array();
         if(!empty($search)){
-            $where = array();
             $where['word'] = array('LIKE', '%'.$search.'%');
         }
         $this->blockedWords = $this->db->selectAll($this->getBannedWordsTable(), $where);
