@@ -9,9 +9,9 @@ namespace Blocking;
 use DBAL\Database;
 
 class IPBlock{
-    protected $db;
-    protected static $blocked_ip_table = 'blocked_ips';
-    protected static $blocked_range_table = 'blocked_ip_range';
+    public $db;
+    protected $blocked_ip_table = 'blocked_ips';
+    protected $blocked_range_table = 'blocked_ip_range';
 
     /**
      * Adds a Database instance for the class to use
@@ -27,18 +27,38 @@ class IPBlock{
      * @return $this
      */
     public function setBlockedIPTable($table){
-        self::$blocked_ip_table = filter_var($table, FILTER_SANITIZE_STRING);
+        if(is_string($table)){
+            $this->blocked_ip_table = filter_var($table, FILTER_SANITIZE_STRING);
+        }
         return $this;
     }
     
+    /**
+     * Returns the blocked IP's database table
+     * @return string
+     */
+    public function getBlockedIPTable(){
+        return $this->blocked_ip_table;
+    }
+
     /**
      * Change the default table name where the IP Range list is located
      * @param string $table This should be the name of the table where the list of IP ranges are located
      * @return $this
      */
     public function setBlockedRangeTable($table){
-        self::$blocked_range_table = filter_var($table, FILTER_SANITIZE_STRING);
+        if(is_string($table)){
+            $this->blocked_range_table = filter_var($table, FILTER_SANITIZE_STRING);
+        }
         return $this;
+    }
+    
+    /**
+     * Returns the blocked IP range database table
+     * @return string
+     */
+    public function getBlockedRangeTable(){
+        return $this->blocked_range_table;
     }
     
     /**
@@ -65,7 +85,7 @@ class IPBlock{
      * @return boolean If the IP is within a blocked range will return true else will return false
      */
     public function isIPBlockedRange($ip){
-        return $this->db->query("SELECT * FROM `".self::$blocked_range_table."` WHERE `ip_start` <= :ip AND `ip_end` >= :ip LIMIT 1;", array('ip' => $ip));
+        return $this->db->select($this->getBlockedRangeTable(), array('ip_start' => array('>=', $ip), 'ip_end' => array('<=', $ip)));
     }
     
     /**

@@ -35,4 +35,4 @@ CREATE TABLE IF NOT EXISTS `blocked_words` (
   `word` varchar(150) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `word` (`word`)
-) ENGINE=MyISAM AUTO_INCREMENT=71 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

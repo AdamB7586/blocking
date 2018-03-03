@@ -12,9 +12,9 @@ use DBAL\Database;
 
 class BannedWords{
     
-    protected $db;
+    public $db;
 
-    protected static $banned_words_table = 'blocked_words';
+    protected $banned_words_table = 'blocked_words';
     protected $blockedWords;
     
     /**
@@ -30,9 +30,19 @@ class BannedWords{
      * @param string $table This should be the table name
      * @return $this BannedWords
      */
-    public function setBannedWordTable($table){
-        self::$banned_words_table = filter_var($table, FILTER_SANITIZE_STRING);
+    public function setBannedWordsTable($table){
+        if(is_string($table)){
+            $this->banned_words_table = filter_var($table, FILTER_SANITIZE_STRING);
+        }
         return $this;
+    }
+    
+    /**
+     * Returns the banned words database table
+     * @return string This should be the banned words table
+     */
+    public function getBannedWordsTable(){
+        return $this->banned_words_table;
     }
     
     /**
@@ -42,7 +52,7 @@ class BannedWords{
      */
     public function containsBlockedWord($text){
         if(!is_array($this->blockedWords)){$this->getBlockedWords();}
-        foreach($this->blockedWords as $a => $words){
+        foreach($this->blockedWords as $words){
             if(strpos(strtolower($text), strtolower($words['word'])) !== false){return true;}
         }
         return false;
@@ -54,8 +64,8 @@ class BannedWords{
      * @return boolean Returns true if added else returns false
      */
     public function addBlockedWord($text){
-        if(!$this->db->count(self::$banned_words_table, array('word' => strtolower($text)))){
-            return $this->db->insert(self::$banned_words_table, array('word' => strtolower($text)));
+        if(!$this->db->count($this->getBannedWordsTable(), array('word' => strtolower($text)))){
+            return $this->db->insert($this->getBannedWordsTable(), array('word' => strtolower($text)));
         }
         return false;
     }
@@ -70,7 +80,7 @@ class BannedWords{
             $where = array();
             $where['word'] = array('LIKE', '%'.$search.'%');
         }
-        $this->blockedWords = $this->db->selectAll(self::$banned_words_table, $where);
+        $this->blockedWords = $this->db->selectAll($this->getBannedWordsTable(), $where);
         return $this->blockedWords;
     }
     
@@ -80,6 +90,6 @@ class BannedWords{
      * @return boolean If the item is successfully removed from the database will return true else return false
      */
     public function removeBlockedWords($id){
-        return $this->db->delete(self::$banned_words_table, array('id' => intval($id)));
+        return $this->db->delete($this->getBannedWordsTable(), array('id' => intval($id)));
     }
 }
