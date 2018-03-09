@@ -76,7 +76,7 @@ class IPBlock{
      * @return boolean If the IP is listed will return true else will return false
      */
     public function isIPBlockedList($ip){
-        return $this->db->select(self::$blocked_ip_table, array('ip' => $ip));
+        return $this->db->select($this->getBlockedIPTable(), array('ip' => $ip));
     }
     
     /**
@@ -94,7 +94,7 @@ class IPBlock{
      * @return boolean If the IP has been successfully added will return true else return false
      */
     public function addIPtoBlock($ip){
-        return $this->db->insert(self::$blocked_ip_table, array('ip' => $ip));
+        return $this->db->insert($this->getBlockedIPTable(), array('ip' => $ip));
     }
     
     /**
@@ -103,7 +103,7 @@ class IPBlock{
      * @return boolean If the IP address is successfully removed will return true else will return false
      */
     public function removeIPFromBlock($ip){
-        return $this->db->delete(self::$blocked_ip_table, array('ip' => $ip), 1);
+        return $this->db->delete($this->getBlockedIPTable(), array('ip' => $ip), 1);
     }
     
     /**
@@ -111,7 +111,7 @@ class IPBlock{
      * @return boolean|array An array will be return containing all blocked IP addresses if none exist will return false
      */
     public function listBlockedIPAddresses(){
-        return $this->db->selectAll(self::$blocked_ip_table);
+        return $this->db->selectAll($this->getBlockedIPTable());
     }
     
     /**
@@ -121,7 +121,7 @@ class IPBlock{
      * @return boolean If the range is successfully added will return true else returns false
      */
     public function addRangetoBlock($start, $end){
-        return $this->db->insert(self::$blocked_range_table, array('ip_start' => $start, 'ip_end' => $end));
+        return $this->db->insert($this->getBlockedRangeTable(), array('ip_start' => $start, 'ip_end' => $end));
     }
     
     /**
@@ -138,7 +138,7 @@ class IPBlock{
         else{
             $where = array('ip_start' => $start, 'ip_end' => $end);
         }
-        return $this->db->delete(self::$blocked_range_table, $where, 1);
+        return $this->db->delete($this->getBlockedRangeTable(), $where, 1);
     }
     
     /**
@@ -146,7 +146,7 @@ class IPBlock{
      * @return boolean|array An array will be return containing all blocked IP address ranges if none exist will return false
      */
     public function listBlockedIPRanges(){
-        return $this->db->selectAll(self::$blocked_range_table);
+        return $this->db->selectAll($this->getBlockedRangeTable());
     }
 
     /**
