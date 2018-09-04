@@ -36,3 +36,15 @@ CREATE TABLE IF NOT EXISTS `blocked_words` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `word` (`word`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `blocked_ips`
+--
+
+CREATE TABLE IF NOT EXISTS `blocked_iso_countries` (
+  `iso` varchar(2) NOT NULL,
+  PRIMARY KEY (`iso`),
+  UNIQUE KEY `iso` (`iso`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;

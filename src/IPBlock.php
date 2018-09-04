@@ -1,17 +1,20 @@
 <?php
 /**
- * Checks to see if an IP is block from a list of IP and Ranges in a database
+ * Checks to see if an IP is block from a list of IPs, Ranges or ISO countries in a database
  * @author Adam Binnersley
- * @version 1.0.0
  */
 namespace Blocking;
 
 use DBAL\Database;
+use GeoIp2\Database\Reader;
 
 class IPBlock{
-    public $db;
+    protected $db;
+    protected $geoIP;
+
     protected $blocked_ip_table = 'blocked_ips';
     protected $blocked_range_table = 'blocked_ip_range';
+    protected $blocked_iso_countries = 'blocked_iso_countries';
 
     /**
      * Adds a Database instance for the class to use
@@ -19,6 +22,7 @@ class IPBlock{
      */
     public function __construct(Database $db) {
         $this->db = $db;
+        $this->geoIP = new Reader(dirname(__FILE__).DIRECTORY_SEPARATOR.'Geo-Country.mmdb');
     }
     
     /**
@@ -62,12 +66,32 @@ class IPBlock{
     }
     
     /**
+     * Change the default table name where the ISO Country list is located
+     * @param string $table This should be that table name where the ISO list is located
+     * @return $this
+     */
+    public function setBlockedISOTable($table){
+        if(is_string($table)){
+            $this->blocked_iso_countries = filter_var($table, FILTER_SANITIZE_STRING);
+        }
+        return $this;
+    }
+    
+    /**
+     * Returns the blocked ISO database table
+     * @return string
+     */
+    public function getBlockedISOTable(){
+        return $this->blocked_iso_countries;
+    }
+
+    /**
      * Checks to see if the given IP is Blocked by listing or range
      * @param string $ip This should be the IP you are checking if it is blocked
      * @return boolean If the IP is listed will return true else will return false
      */
     public function isIPBlocked($ip){
-        return ($this->isIPBlockedList($ip) || $this->isIPBlockedRange($ip));
+        return ($this->isIPBlockedList($ip) || $this->isIPBlockedRange($ip) || $this->isISOBlocked($ip));
     }
     
     /**
@@ -76,7 +100,7 @@ class IPBlock{
      * @return boolean If the IP is listed will return true else will return false
      */
     public function isIPBlockedList($ip){
-        return $this->db->select($this->getBlockedIPTable(), array('ip' => $ip));
+        return $this->db->select($this->getBlockedIPTable(), ['ip' => $ip]);
     }
     
     /**
@@ -85,7 +109,11 @@ class IPBlock{
      * @return boolean If the IP is within a blocked range will return true else will return false
      */
     public function isIPBlockedRange($ip){
-        return $this->db->select($this->getBlockedRangeTable(), array('ip_start' => array('>=', $ip), 'ip_end' => array('<=', $ip)));
+        return $this->db->select($this->getBlockedRangeTable(), ['ip_start' => ['>=', $ip], 'ip_end' => ['<=', $ip]]);
+    }
+    
+    public function isISOBlocked($ip){
+        return $this->db->select($this->getBlockedISOTable(), ['iso' => $this->getIPCountryISO($ip)]);
     }
     
     /**
@@ -94,7 +122,7 @@ class IPBlock{
      * @return boolean If the IP has been successfully added will return true else return false
      */
     public function addIPtoBlock($ip){
-        return $this->db->insert($this->getBlockedIPTable(), array('ip' => $ip));
+        return $this->db->insert($this->getBlockedIPTable(), ['ip' => $ip]);
     }
     
     /**
@@ -103,7 +131,7 @@ class IPBlock{
      * @return boolean If the IP address is successfully removed will return true else will return false
      */
     public function removeIPFromBlock($ip){
-        return $this->db->delete($this->getBlockedIPTable(), array('ip' => $ip), 1);
+        return $this->db->delete($this->getBlockedIPTable(), ['ip' => $ip], 1);
     }
     
     /**
@@ -121,7 +149,7 @@ class IPBlock{
      * @return boolean If the range is successfully added will return true else returns false
      */
     public function addRangetoBlock($start, $end){
-        return $this->db->insert($this->getBlockedRangeTable(), array('ip_start' => $start, 'ip_end' => $end));
+        return $this->db->insert($this->getBlockedRangeTable(), ['ip_start' => $start, 'ip_end' => $end]);
     }
     
     /**
@@ -133,10 +161,10 @@ class IPBlock{
      */
     public function removeRangeFromBlock($id, $start = NULL, $end = NULL){
         if(is_numeric($id)){
-            $where = array('id' => $id);
+            $where = ['id' => $id];
         }
         else{
-            $where = array('ip_start' => $start, 'ip_end' => $end);
+            $where = ['ip_start' => $start, 'ip_end' => $end];
         }
         return $this->db->delete($this->getBlockedRangeTable(), $where, 1);
     }
@@ -147,6 +175,43 @@ class IPBlock{
      */
     public function listBlockedIPRanges(){
         return $this->db->selectAll($this->getBlockedRangeTable());
+    }
+    
+    /**
+     * Returns the ISO county of an IP address
+     * @param string $ip This should be the IP address you are checking
+     * @return array|false 
+     */
+    public function getIPCountryISO($ip){
+        $search = $this->geoIP->country($ip);
+        if(is_object($search)){
+            return $search->country->isoCode;
+        }
+        return false;
+    }
+    
+    /**
+     * Add an ISO country to the blocked list
+     * @param string $iso This should be the ISO county
+     * @return boolean If inserted successfully will return true else will return false
+     */
+    public function addISOCountryBlock($iso){
+        if(!empty(trim($iso)) && is_string($iso)){
+            return $this->db->insert($this->getBlockedISOTable(), ['iso' => trim($iso)]);
+        }
+        return false;
+    }
+    
+    /**
+     * 
+     * @param type $iso
+     * @return boolean
+     */
+    public function removeISOCountryBlock($iso){
+        if(!empty(trim($iso)) && is_string($iso)){
+            return $this->db->delete($this->getBlockedISOTable(), ['iso' => trim($iso)]);
+        }
+        return false;
     }
 
     /**

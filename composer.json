@@ -3,7 +3,8 @@
     "description": "Block IP by either IP or range and check to see if string contains blocked word or phrase",
     "type": "library",
     "require": {
-        "adamb/database": "^1.0"
+        "adamb/database": "^1.0",
+        "geoip2/geoip2": "^2.9"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.5"
