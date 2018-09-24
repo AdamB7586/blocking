@@ -112,6 +112,11 @@ class IPBlock{
         return $this->db->select($this->getBlockedRangeTable(), ['ip_start' => ['>=', $ip], 'ip_end' => ['<=', $ip]]);
     }
     
+    /**
+     * Check to see if the ISO county of the IP is blocked 
+     * @param string $ip This should be the IP you are checking if it is blocked
+     * @return boolean If the IP country is blocked will return true else returns false
+     */
     public function isISOBlocked($ip){
         return $this->db->select($this->getBlockedISOTable(), ['iso' => $this->getIPCountryISO($ip)]);
     }
@@ -183,9 +188,14 @@ class IPBlock{
      * @return array|false 
      */
     public function getIPCountryISO($ip){
-        $search = $this->geoIP->country($ip);
-        if(is_object($search)){
-            return $search->country->isoCode;
+        try{
+            $search = $this->geoIP->country($ip);
+            if(is_object($search)){
+                return $search->country->isoCode;
+            }
+        }
+        catch(\Exception $e){
+            // Cache any IP that arn't found in the database
         }
         return false;
     }
@@ -203,9 +213,9 @@ class IPBlock{
     }
     
     /**
-     * 
-     * @param type $iso
-     * @return boolean
+     * Remove an ISO country from the blocked list
+     * @param string $iso This should be the ISO county
+     * @return boolean If deleted will return true else will return false
      */
     public function removeISOCountryBlock($iso){
         if(!empty(trim($iso)) && is_string($iso)){
