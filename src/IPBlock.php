@@ -229,7 +229,10 @@ class IPBlock{
      * @return string the users IP will be returned
      */
     public function getUserIP(){
-        if(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != ''){
+        if(isset($_SERVER["HTTP_CF_CONNECTING_IP"])){
+            return $_SERVER["HTTP_CF_CONNECTING_IP"];
+        }
+        elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR']) && $_SERVER['HTTP_X_FORWARDED_FOR'] != ''){
             return $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
         else{
