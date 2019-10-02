@@ -52,8 +52,10 @@ class BannedWords{
      */
     public function containsBlockedWord($text){
         if(!is_array($this->blockedWords)){$this->getBlockedWords();}
-        foreach($this->blockedWords as $words){
-            if(strpos(strtolower($text), strtolower($words['word'])) !== false){return true;}
+        if(is_array($this->blockedWords)){
+            foreach($this->blockedWords as $words){
+                if(strpos(strtolower($text), strtolower($words['word'])) !== false){return true;}
+            }
         }
         return false;
     }
