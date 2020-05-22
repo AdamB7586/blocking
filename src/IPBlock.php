@@ -109,7 +109,16 @@ class IPBlock{
      * @return boolean If the IP is within a blocked range will return true else will return false
      */
     public function isIPBlockedRange($ip){
-        return $this->db->select($this->getBlockedRangeTable(), ['ip_start' => ['>=', $ip], 'ip_end' => ['<=', $ip]]);
+        $ranges = $this->db->selectAll($this->getBlockedRangeTable());
+        if(is_array($ranges)){
+            $checkIP = ip2long($ip);
+            foreach ($ranges as $range){
+                if($checkIP >= ip2long($range['ip_start']) && $checkIP <= ip2long($range['ip_end'])){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     /**
