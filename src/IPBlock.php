@@ -109,16 +109,8 @@ class IPBlock{
      * @return boolean If the IP is within a blocked range will return true else will return false
      */
     public function isIPBlockedRange($ip){
-        $ranges = $this->db->selectAll($this->getBlockedRangeTable());
-        if(is_array($ranges)){
-            $checkIP = ip2long($ip);
-            foreach ($ranges as $range){
-                if($checkIP >= ip2long($range['ip_start']) && $checkIP <= ip2long($range['ip_end'])){
-                    return true;
-                }
-            }
-        }
-        return false;
+        $checkIP = ip2long($ip);
+        return $this->db->select($this->getBlockedRangeTable(), ['ip_start' => ['<=' => $checkIP], 'ip_end' => ['>=' => $checkIP]]);
     }
     
     /**
@@ -163,7 +155,7 @@ class IPBlock{
      * @return boolean If the range is successfully added will return true else returns false
      */
     public function addRangetoBlock($start, $end){
-        return $this->db->insert($this->getBlockedRangeTable(), ['ip_start' => $start, 'ip_end' => $end]);
+        return $this->db->insert($this->getBlockedRangeTable(), ['ip_start' => ip2long($start), 'ip_end' => ip2long($end)]);
     }
     
     /**
@@ -178,7 +170,7 @@ class IPBlock{
             $where = ['id' => $id];
         }
         else{
-            $where = ['ip_start' => $start, 'ip_end' => $end];
+            $where = ['ip_start' => ip2long($start), 'ip_end' => ip2long($end)];
         }
         return $this->db->delete($this->getBlockedRangeTable(), $where, 1);
     }
@@ -188,7 +180,13 @@ class IPBlock{
      * @return boolean|array An array will be return containing all blocked IP address ranges if none exist will return false
      */
     public function listBlockedIPRanges(){
-        return $this->db->selectAll($this->getBlockedRangeTable());
+        $ranges = $this->db->selectAll($this->getBlockedRangeTable());
+        if(is_array($ranges)){
+            foreach($ranges as $i => $range){
+                $ranges[$i]['ip_start'] = long2ip($range['ip_start']);
+                $ranges[$i]['ip_end'] = long2ip($range['ip_end']);
+            }
+        }
     }
     
     /**
