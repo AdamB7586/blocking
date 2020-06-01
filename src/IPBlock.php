@@ -187,6 +187,7 @@ class IPBlock{
                 $ranges[$i]['ip_end'] = long2ip($range['ip_end']);
             }
         }
+        return $ranges;
     }
     
     /**
