@@ -128,7 +128,10 @@ class IPBlock{
      * @return boolean If the IP has been successfully added will return true else return false
      */
     public function addIPtoBlock($ip){
-        return $this->db->insert($this->getBlockedIPTable(), ['ip' => $ip]);
+        if(!$this->isIPBlockedList($ip)){
+            return $this->db->insert($this->getBlockedIPTable(), ['ip' => $ip]);
+        }
+        return false;
     }
     
     /**
