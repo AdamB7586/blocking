@@ -1,18 +1,10 @@
 build:
     environment:
-        php: '7.1.0'
+        php: '7.4.0'
         
     project_setup:
         before:
             - mysql -e "CREATE DATABASE IF NOT EXISTS blocking"
-            
-    tests:
-        override:
-            -
-                command: 'vendor/bin/phpunit --coverage-clover=coverage'
-                coverage:
-                    file: 'coverage'
-                    format: 'clover'
 
 before_commands:
     - "composer install --prefer-source"

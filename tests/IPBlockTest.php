@@ -1,16 +1,20 @@
 <?php
 
+namespace Blocking\Tests;
+
 use PHPUnit\Framework\TestCase;
 use DBAL\Database;
 use Blocking\IPBlock;
 
-class IPBlockTest extends TestCase{
+class IPBlockTest extends TestCase
+{
     protected $db;
     protected $ipblock;
     
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->db = new Database($GLOBALS['HOSTNAME'], $GLOBALS['USERNAME'], $GLOBALS['PASSWORD'], $GLOBALS['DATABASE']);
-        if(!$this->db->isConnected()){
+        if (!$this->db->isConnected()) {
             $this->markTestSkipped(
                 'No local database connection is available'
             );
@@ -21,7 +25,8 @@ class IPBlockTest extends TestCase{
         $this->db->truncate($this->ipblock->getBlockedRangeTable());
     }
     
-    protected function tearDown() {
+    protected function tearDown(): void
+    {
         $this->db = null;
         $this->ipblock = null;
     }
@@ -33,7 +38,8 @@ class IPBlockTest extends TestCase{
      * @covers Blocking\IPBlock::setBlockedRangeTable
      * @covers Blocking\IPBlock::getBlockedRangeTable
      */
-    public function testSetTables(){
+    public function testSetTables()
+    {
         $this->assertEquals('blocked_ips', $this->ipblock->getBlockedIPTable());
         $this->assertObjectHasAttribute('db', $this->ipblock->setBlockedIPTable(false));
         $this->assertEquals('blocked_ips', $this->ipblock->getBlockedIPTable());
@@ -48,6 +54,4 @@ class IPBlockTest extends TestCase{
         $this->assertNotEquals('blocked_ip_range', $this->ipblock->getBlockedRangeTable());
         $this->assertEquals('blocked_range', $this->ipblock->getBlockedRangeTable());
     }
-    
-    
 }

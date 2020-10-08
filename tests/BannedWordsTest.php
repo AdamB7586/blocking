@@ -1,16 +1,20 @@
 <?php
 
+namespace Blocking\Tests;
+
 use PHPUnit\Framework\TestCase;
 use DBAL\Database;
 use Blocking\BannedWords;
 
-class BannedWordsTest extends TestCase{
+class BannedWordsTest extends TestCase
+{
     protected $db;
     protected $bannedwords;
 
-    protected function setUp() {
+    protected function setUp(): void
+    {
         $this->db = new Database($GLOBALS['HOSTNAME'], $GLOBALS['USERNAME'], $GLOBALS['PASSWORD'], $GLOBALS['DATABASE']);
-        if(!$this->db->isConnected()){
+        if (!$this->db->isConnected()) {
             $this->markTestSkipped(
                 'No local database connection is available'
             );
@@ -20,7 +24,8 @@ class BannedWordsTest extends TestCase{
         $this->db->truncate($this->bannedwords->getBannedWordsTable());
     }
     
-    protected function tearDown() {
+    protected function tearDown(): void
+    {
         $this->db = null;
         $this->bannedwords = null;
     }
@@ -30,14 +35,15 @@ class BannedWordsTest extends TestCase{
      * @covers Blocking\BannedWords::setBannedWordsTable
      * @covers Blocking\BannedWords::getBannedWordsTable
      */
-    public function testSetTable(){
+    public function testSetTable()
+    {
         $this->assertEquals('blocked_words', $this->bannedwords->getBannedWordsTable());
         $this->assertObjectHasAttribute('db', $this->bannedwords->setBannedWordsTable(false));
         $this->assertEquals('blocked_words', $this->bannedwords->getBannedWordsTable());
         $this->assertObjectHasAttribute('db', $this->bannedwords->setBannedWordsTable(103));
         $this->assertEquals('blocked_words', $this->bannedwords->getBannedWordsTable());
         $this->assertObjectHasAttribute('db', $this->bannedwords->setBannedWordsTable('my_words_table'));
-        $this->assertNotContains('blocked_words', $this->bannedwords->getBannedWordsTable());
+        $this->assertStringNotContainsString('blocked_words', $this->bannedwords->getBannedWordsTable());
         $this->assertEquals('my_words_table', $this->bannedwords->getBannedWordsTable());
     }
     
@@ -46,7 +52,8 @@ class BannedWordsTest extends TestCase{
      * @covers Blocking\BannedWords::addBlockedWord
      * @covers Blocking\BannedWords::getBannedWordsTable
      */
-    public function testAddBannedWord(){
+    public function testAddBannedWord()
+    {
         $this->assertTrue($this->bannedwords->addBlockedWord('improve ranking'));
         $this->assertFalse($this->bannedwords->addBlockedWord('improve ranking')); // Fail as same as before
         $this->assertFalse($this->bannedwords->addBlockedWord('imPRove RankIng')); // Fail as same but different case
