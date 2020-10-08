@@ -10,7 +10,8 @@ namespace Blocking;
 
 use DBAL\Database;
 
-class BannedWords{
+class BannedWords
+{
     
     public $db;
 
@@ -21,7 +22,8 @@ class BannedWords{
      * Initiates the Database Instance
      * @param Database $db This should be an instance of he database
      */
-    public function __construct(Database $db) {
+    public function __construct(Database $db)
+    {
         $this->db = $db;
     }
     
@@ -30,8 +32,9 @@ class BannedWords{
      * @param string $table This should be the table name
      * @return $this BannedWords
      */
-    public function setBannedWordsTable($table){
-        if(is_string($table)){
+    public function setBannedWordsTable($table)
+    {
+        if (is_string($table)) {
             $this->banned_words_table = filter_var($table, FILTER_SANITIZE_STRING);
         }
         return $this;
@@ -41,7 +44,8 @@ class BannedWords{
      * Returns the banned words database table
      * @return string This should be the banned words table
      */
-    public function getBannedWordsTable(){
+    public function getBannedWordsTable()
+    {
         return $this->banned_words_table;
     }
     
@@ -50,11 +54,16 @@ class BannedWords{
      * @param string $text This should be the string of text that you wish to check for the banned words
      * @return boolean if the test contain a banned word will return true else return false
      */
-    public function containsBlockedWord($text){
-        if(!is_array($this->blockedWords)){$this->getBlockedWords();}
-        if(is_array($this->blockedWords)){
-            foreach($this->blockedWords as $words){
-                if(strpos(strtolower($text), strtolower($words['word'])) !== false){return true;}
+    public function containsBlockedWord($text)
+    {
+        if (!is_array($this->blockedWords)) {
+            $this->getBlockedWords();
+        }
+        if (is_array($this->blockedWords)) {
+            foreach ($this->blockedWords as $words) {
+                if (strpos(strtolower($text), strtolower($words['word'])) !== false) {
+                    return true;
+                }
             }
         }
         return false;
@@ -65,8 +74,9 @@ class BannedWords{
      * @param string $text This should be the word or words you wish to block/use to detect spam
      * @return boolean Returns true if added else returns false
      */
-    public function addBlockedWord($text){
-        if(!$this->db->count($this->getBannedWordsTable(), array('word' => strtolower($text)))){
+    public function addBlockedWord($text)
+    {
+        if (!$this->db->count($this->getBannedWordsTable(), array('word' => strtolower($text)))) {
             return $this->db->insert($this->getBannedWordsTable(), array('word' => strtolower($text)));
         }
         return false;
@@ -77,9 +87,10 @@ class BannedWords{
      * @param string $search If you want to search for any words within the blocked list enter a string here
      * @return array|boolean If blocked words exist returns array else returns false
      */
-    public function getBlockedWords($search = ''){
+    public function getBlockedWords($search = '')
+    {
         $where = array();
-        if(!empty($search)){
+        if (!empty($search)) {
             $where['word'] = array('LIKE', '%'.$search.'%');
         }
         $this->blockedWords = $this->db->selectAll($this->getBannedWordsTable(), $where);
@@ -91,7 +102,8 @@ class BannedWords{
      * @param int $id This should be the unique ID given to the blocked word or phrase
      * @return boolean If the item is successfully removed from the database will return true else return false
      */
-    public function removeBlockedWords($id){
+    public function removeBlockedWords($id)
+    {
         return $this->db->delete($this->getBannedWordsTable(), array('id' => intval($id)));
     }
 }
