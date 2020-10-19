@@ -20,5 +20,7 @@
     <var name="PASSWORD" value=""/>
     <var name="DATABASE" value="blocking"/>
     <var name="DRIVER" value="mysql"/>
+    
+    <server name="REMOTE_ADDR" value="212.42.18.1"/>
   </php>
 </phpunit>

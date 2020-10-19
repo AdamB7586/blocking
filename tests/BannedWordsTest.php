@@ -51,11 +51,22 @@ class BannedWordsTest extends TestCase
      * @covers Blocking\BannedWords::__construct
      * @covers Blocking\BannedWords::addBlockedWord
      * @covers Blocking\BannedWords::getBannedWordsTable
+     * @covers Blocking\BannedWords::containsBlockedWord
+     * @covers Blocking\BannedWords::getBlockedWords
+     * @covers Blocking\BannedWords::removeBlockedWords
      */
     public function testAddBannedWord()
     {
         $this->assertTrue($this->bannedwords->addBlockedWord('improve ranking'));
         $this->assertFalse($this->bannedwords->addBlockedWord('improve ranking')); // Fail as same as before
         $this->assertFalse($this->bannedwords->addBlockedWord('imPRove RankIng')); // Fail as same but different case
+        $this->assertTrue($this->bannedwords->addBlockedWord('seo'));
+        $this->assertTrue($this->bannedwords->containsBlockedWord('page 1 of Google, improve ranking of your website'));
+        $this->assertFalse($this->bannedwords->containsBlockedWord('This is genuine information to help improve you business status'));
+        $this->assertArrayHasKey('word', $this->bannedwords->getBlockedWords('improve')[0]);
+        $this->assertFalse($this->bannedwords->removeBlockedWords(10));
+        $this->assertTrue($this->bannedwords->removeBlockedWords(1));
+        $this->assertFalse($this->bannedwords->containsBlockedWord('page 1 of Google, improve ranking of your website'));
+        $this->assertTrue($this->bannedwords->containsBlockedWord('whitehat SEO'));
     }
 }
