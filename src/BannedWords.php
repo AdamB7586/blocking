@@ -89,9 +89,9 @@ class BannedWords
      */
     public function getBlockedWords($search = '')
     {
-        $where = array();
+        $where = [];
         if (!empty($search)) {
-            $where['word'] = array('LIKE', '%'.$search.'%');
+            $where['word'] = ['LIKE', '%'.$search.'%'];
         }
         $this->blockedWords = $this->db->selectAll($this->getBannedWordsTable(), $where);
         return $this->blockedWords;
@@ -104,6 +104,8 @@ class BannedWords
      */
     public function removeBlockedWords($id)
     {
-        return $this->db->delete($this->getBannedWordsTable(), array('id' => intval($id)));
+        $remove = $this->db->delete($this->getBannedWordsTable(), ['id' => intval($id)]);
+        $this->blockedWords = false;
+        return $remove;
     }
 }

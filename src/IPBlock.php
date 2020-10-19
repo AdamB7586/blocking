@@ -110,7 +110,7 @@ class IPBlock
      */
     public function isIPBlockedList($ip)
     {
-        return $this->db->select($this->getBlockedIPTable(), ['ip' => $ip]);
+        return boolval($this->db->select($this->getBlockedIPTable(), ['ip' => $ip]));
     }
     
     /**
@@ -141,7 +141,7 @@ class IPBlock
      */
     public function addIPtoBlock($ip)
     {
-        if (!$this->isIPBlockedList($ip)) {
+        if (!$this->isIPBlockedList($ip) && filter_var($ip, FILTER_VALIDATE_IP)) {
             return $this->db->insert($this->getBlockedIPTable(), ['ip' => $ip]);
         }
         return false;
@@ -174,7 +174,10 @@ class IPBlock
      */
     public function addRangetoBlock($start, $end)
     {
-        return $this->db->insert($this->getBlockedRangeTable(), ['ip_start' => ip2long($start), 'ip_end' => ip2long($end)]);
+        if (filter_var($start, FILTER_VALIDATE_IP) && filter_var($end, FILTER_VALIDATE_IP) && !$this->db->select($this->getBlockedRangeTable(), ['ip_start' => ip2long($start), 'ip_end' => ip2long($end)])) {
+            return $this->db->insert($this->getBlockedRangeTable(), ['ip_start' => ip2long($start), 'ip_end' => ip2long($end)]);
+        }
+        return false;
     }
     
     /**
@@ -235,7 +238,7 @@ class IPBlock
      */
     public function addISOCountryBlock($iso)
     {
-        if (!empty(trim($iso)) && is_string($iso)) {
+        if (!empty(trim($iso)) && is_string($iso) && strlen($iso) === 2) {
             return $this->db->insert($this->getBlockedISOTable(), ['iso' => trim($iso)]);
         }
         return false;
@@ -248,7 +251,7 @@ class IPBlock
      */
     public function removeISOCountryBlock($iso)
     {
-        if (!empty(trim($iso)) && is_string($iso)) {
+        if (!empty(trim($iso)) && is_string($iso) && strlen($iso) === 2) {
             return $this->db->delete($this->getBlockedISOTable(), ['iso' => trim($iso)]);
         }
         return false;
