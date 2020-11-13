@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS `blocked_ips` (
 
 CREATE TABLE IF NOT EXISTS `blocked_ip_range` (
   `id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `ip_start` varchar(45) NOT NULL,
-  `ip_end` varchar(45) NOT NULL,
+  `ip_start` bigint(45) NOT NULL,
+  `ip_end` bigint(20) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_range` (`ip_start`,`ip_end`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
